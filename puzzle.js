@@ -1,11 +1,4 @@
-// Image loading
-const imageUrl = 'https://raw.githubusercontent.com/nishi-0212/puzzle-love/main/photo.jpg';
-const GRID_SIZE = 4;
-const PIECE_SIZE = 200;
-const GRID_COLS = 4;
-const GRID_ROWS = 4;
-const SNAP_DISTANCE = 30;
-
+// Image loading - will use base64 encoded image data from HTML
 let canvas, ctx;
 let image = new Image();
 let pieces = [];
@@ -13,6 +6,11 @@ let draggedPiece = null;
 let offsetX = 0;
 let offsetY = 0;
 let completedPieces = new Set();
+
+const PIECE_SIZE = 200;
+const GRID_COLS = 4;
+const GRID_ROWS = 4;
+const SNAP_DISTANCE = 30;
 
 class Piece {
     constructor(col, row, imageData) {
@@ -29,17 +27,17 @@ class Piece {
 
     draw(ctx) {
         if (!this.isPlaced) {
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetX = 2;
+            ctx.shadowColor = 'rgba(44, 36, 22, 0.15)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 1;
             ctx.shadowOffsetY = 2;
         } else {
             ctx.shadowColor = 'transparent';
         }
 
         ctx.putImageData(this.imageData, this.x, this.y);
-        ctx.strokeStyle = this.isPlaced ? 'rgba(102, 126, 234, 0.3)' : 'rgba(0, 0, 0, 0.2)';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = this.isPlaced ? 'rgba(107, 142, 113, 0.2)' : 'rgba(44, 36, 22, 0.15)';
+        ctx.lineWidth = 1;
         ctx.strokeRect(this.x, this.y, PIECE_SIZE, PIECE_SIZE);
         ctx.shadowColor = 'transparent';
     }
@@ -80,15 +78,25 @@ function init() {
     };
 
     image.onerror = () => {
-        ctx.fillStyle = '#ddd';
+        console.error('Image failed to load');
+        ctx.fillStyle = '#e8e6e1';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#999';
-        ctx.font = '20px Arial';
+        ctx.fillStyle = '#2c2416';
+        ctx.font = 'italic 18px Georgia';
         ctx.textAlign = 'center';
-        ctx.fillText('Loading image...', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Please upload your photo...', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.font = '14px Georgia';
+        ctx.fillText('Upload photo.jpg to the repository', canvas.width / 2, canvas.height / 2 + 20);
     };
 
-    image.src = imageUrl;
+    // Try to load from multiple sources
+    const sources = [
+        'photo.jpg',
+        './photo.jpg',
+        'https://raw.githubusercontent.com/nishi-0212/puzzle-love/main/photo.jpg'
+    ];
+    
+    tryLoadImage(sources, 0);
 
     canvas.addEventListener('mousedown', onMouseDown);
     canvas.addEventListener('mousemove', onMouseMove);
@@ -96,6 +104,26 @@ function init() {
     canvas.addEventListener('touchstart', onTouchStart);
     canvas.addEventListener('touchmove', onTouchMove);
     canvas.addEventListener('touchend', onTouchEnd);
+}
+
+function tryLoadImage(sources, index) {
+    if (index >= sources.length) {
+        image.onerror();
+        return;
+    }
+    
+    const tempImg = new Image();
+    tempImg.crossOrigin = 'anonymous';
+    
+    tempImg.onload = () => {
+        image.src = sources[index];
+    };
+    
+    tempImg.onerror = () => {
+        tryLoadImage(sources, index + 1);
+    };
+    
+    tempImg.src = sources[index];
 }
 
 function createPieces() {
@@ -126,11 +154,11 @@ function createPieces() {
 }
 
 function draw() {
-    ctx.fillStyle = 'rgba(245, 247, 250, 0.8)';
+    ctx.fillStyle = 'rgba(249, 247, 244, 0.9)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.strokeStyle = 'rgba(200, 200, 200, 0.3)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(224, 217, 208, 0.4)';
+    ctx.lineWidth = 0.5;
     for (let i = 0; i <= GRID_COLS; i++) {
         ctx.beginPath();
         ctx.moveTo(i * PIECE_SIZE, 0);
@@ -289,17 +317,17 @@ function playSound(type) {
         gainNode.connect(audioContext.destination);
 
         if (type === 'snap') {
-            oscillator.frequency.value = 800;
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
-        } else if (type === 'complete') {
-            oscillator.frequency.value = 1200;
+            oscillator.frequency.value = 700;
             gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
+            oscillator.stop(audioContext.currentTime + 0.08);
+        } else if (type === 'complete') {
+            oscillator.frequency.value = 900;
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.25);
         }
     } catch (e) {
         console.log('Audio not available');
