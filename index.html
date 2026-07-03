@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Our Puzzle</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
     <div class="container">
@@ -14,7 +17,7 @@
         </div>
 
         <div class="game-wrapper">
-            <canvas id="puzzleCanvas" width="800" height="800"></canvas>
+            <canvas id="puzzleCanvas" width="1024" height="1024"></canvas>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
                 <span class="progress-text" id="progressText">0%</span>
@@ -34,6 +37,6 @@
         </div>
     </div>
 
-    <script src="puzzle.js"></script>
+    <script src="puzzle.js?v=3"></script>
 </body>
 </html>
