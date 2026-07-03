@@ -7,7 +7,7 @@ let offsetX = 0;
 let offsetY = 0;
 let completedPieces = new Set();
 
-const PIECE_SIZE = 200;
+const PIECE_SIZE = 256; // Increased from 200px to 256px
 const GRID_COLS = 4;
 const GRID_ROWS = 4;
 const SNAP_DISTANCE = 30;
@@ -67,9 +67,13 @@ function init() {
     canvas = document.getElementById('puzzleCanvas');
     ctx = canvas.getContext('2d');
 
+    // Set canvas to 1024x1024 (4x4 grid of 256px pieces)
+    canvas.width = 1024;
+    canvas.height = 1024;
+
     if (window.innerWidth <= 768) {
-        canvas.width = 400;
-        canvas.height = 400;
+        canvas.width = 512;
+        canvas.height = 512;
     }
 
     image.onload = () => {
